@@ -1,0 +1,38 @@
+[2026-04-03 05:46:43] IP:127.0.0.1 PORT:36462 MSG:{"sensor_id": "sensor-01", "tipo": "temperatura", "valor": 32.26, "unidad": "\u00b0C"} RESP:ERROR|comando desconocido
+[2026-04-03 05:46:46] IP:127.0.0.1 PORT:36462 MSG:{"sensor_id": "sensor-01", "tipo": "temperatura", "valor": 21.44, "unidad": "\u00b0C"} RESP:ERROR|comando desconocido
+[2026-04-03 05:46:49] IP:127.0.0.1 PORT:55671 MSG:{"sensor_id": "sensor-02", "tipo": "humedad", "valor": 61.84, "unidad": "%"} RESP:ERROR|comando desconocido
+[2026-04-03 05:46:49] IP:127.0.0.1 PORT:36462 MSG:{"sensor_id": "sensor-01", "tipo": "temperatura", "valor": 30.09, "unidad": "\u00b0C"} RESP:ERROR|comando desconocido
+[2026-04-03 05:46:52] IP:127.0.0.1 PORT:55671 MSG:{"sensor_id": "sensor-02", "tipo": "humedad", "valor": 84.99, "unidad": "%"} RESP:ERROR|comando desconocido
+[2026-04-03 05:46:52] IP:127.0.0.1 PORT:36462 MSG:{"sensor_id": "sensor-01", "tipo": "temperatura", "valor": 21.19, "unidad": "\u00b0C"} RESP:ERROR|comando desconocido
+[2026-04-03 05:46:55] IP:127.0.0.1 PORT:55671 MSG:{"sensor_id": "sensor-02", "tipo": "humedad", "valor": 76.22, "unidad": "%"} RESP:ERROR|comando desconocido
+[2026-04-03 05:46:55] IP:127.0.0.1 PORT:36462 MSG:{"sensor_id": "sensor-01", "tipo": "temperatura", "valor": 27.69, "unidad": "\u00b0C"} RESP:ERROR|comando desconocido
+[2026-04-03 05:46:58] IP:127.0.0.1 PORT:55671 MSG:{"sensor_id": "sensor-02", "tipo": "humedad", "valor": 87.29, "unidad": "%"} RESP:ERROR|comando desconocido
+[2026-04-03 05:46:58] IP:127.0.0.1 PORT:36462 MSG:{"sensor_id": "sensor-01", "tipo": "temperatura", "valor": 22.87, "unidad": "\u00b0C"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:01] IP:127.0.0.1 PORT:55671 MSG:{"sensor_id": "sensor-02", "tipo": "humedad", "valor": 77.9, "unidad": "%"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:01] IP:127.0.0.1 PORT:36462 MSG:{"sensor_id": "sensor-01", "tipo": "temperatura", "valor": 17.03, "unidad": "\u00b0C"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:04] IP:127.0.0.1 PORT:55671 MSG:{"sensor_id": "sensor-02", "tipo": "humedad", "valor": 54.43, "unidad": "%"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:04] IP:127.0.0.1 PORT:36462 MSG:{"sensor_id": "sensor-01", "tipo": "temperatura", "valor": 24.28, "unidad": "\u00b0C"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:07] IP:127.0.0.1 PORT:55671 MSG:{"sensor_id": "sensor-02", "tipo": "humedad", "valor": 86.65, "unidad": "%"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:07] IP:127.0.0.1 PORT:36462 MSG:{"sensor_id": "sensor-01", "tipo": "temperatura", "valor": 21.7, "unidad": "\u00b0C"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:10] IP:127.0.0.1 PORT:55671 MSG:{"sensor_id": "sensor-02", "tipo": "humedad", "valor": 57.32, "unidad": "%"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:10] IP:127.0.0.1 PORT:36462 MSG:{"sensor_id": "sensor-01", "tipo": "temperatura", "valor": 27.63, "unidad": "\u00b0C"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:13] IP:127.0.0.1 PORT:55671 MSG:{"sensor_id": "sensor-02", "tipo": "humedad", "valor": 84.52, "unidad": "%"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:13] IP:127.0.0.1 PORT:36462 MSG:{"sensor_id": "sensor-01", "tipo": "temperatura", "valor": 34.9, "unidad": "\u00b0C"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:16] IP:127.0.0.1 PORT:55671 MSG:{"sensor_id": "sensor-02", "tipo": "humedad", "valor": 84.56, "unidad": "%"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:16] IP:127.0.0.1 PORT:36462 MSG:{"sensor_id": "sensor-01", "tipo": "temperatura", "valor": 17.63, "unidad": "\u00b0C"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:19] IP:127.0.0.1 PORT:55671 MSG:{"sensor_id": "sensor-02", "tipo": "humedad", "valor": 45.97, "unidad": "%"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:19] IP:127.0.0.1 PORT:36462 MSG:{"sensor_id": "sensor-01", "tipo": "temperatura", "valor": 27.09, "unidad": "\u00b0C"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:22] IP:127.0.0.1 PORT:55671 MSG:{"sensor_id": "sensor-02", "tipo": "humedad", "valor": 75.06, "unidad": "%"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:22] IP:127.0.0.1 PORT:36462 MSG:{"sensor_id": "sensor-01", "tipo": "temperatura", "valor": 21.42, "unidad": "\u00b0C"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:25] IP:127.0.0.1 PORT:55671 MSG:{"sensor_id": "sensor-02", "tipo": "humedad", "valor": 83.72, "unidad": "%"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:25] IP:127.0.0.1 PORT:36462 MSG:{"sensor_id": "sensor-01", "tipo": "temperatura", "valor": 24.04, "unidad": "\u00b0C"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:28] IP:127.0.0.1 PORT:55671 MSG:{"sensor_id": "sensor-02", "tipo": "humedad", "valor": 89.37, "unidad": "%"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:28] IP:127.0.0.1 PORT:36462 MSG:{"sensor_id": "sensor-01", "tipo": "temperatura", "valor": 34.97, "unidad": "\u00b0C"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:31] IP:127.0.0.1 PORT:55671 MSG:{"sensor_id": "sensor-02", "tipo": "humedad", "valor": 91.89, "unidad": "%"} RESP:ERROR|comando desconocido
+[2026-04-03 05:47:37] IP:127.0.0.1 PORT:41056 MSG:REGISTER|sensor-01|temperatura RESP:OK|sensor registrado
+
+[2026-04-03 05:48:01] IP:127.0.0.1 PORT:33378 MSG:STATS| RESP:OK|sensores:1|operadores:1
+
+[2026-04-03 05:48:16] IP:127.0.0.1 PORT:43174 MSG:DATA|sensor-01|temperatura|28.5|C RESP:OK|dato recibido
+[2026-04-03 05:51:19] IP:127.0.0.1 PORT:47426 MSG:{"comando": "LIST"} RESP:ERROR|comando desconocido
+
