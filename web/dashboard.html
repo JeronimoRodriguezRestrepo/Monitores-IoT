@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>IoT Monitor - Panel de Operador</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #0f172a; color: #e2e8f0; }
+        
+        header {
+            background: #1e293b;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #38bdf8;
+        }
+        header h1 { color: #38bdf8; font-size: 22px; }
+        .status { display: flex; align-items: center; gap: 8px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+        .stats-bar {
+            display: flex;
+            gap: 20px;
+            padding: 20px 30px;
+            background: #162032;
+        }
+        .stat {
+            background: #1e293b;
+            border-radius: 10px;
+            padding: 15px 25px;
+            text-align: center;
+            flex: 1;
+            border-top: 3px solid #38bdf8;
+        }
+        .stat .numero { font-size: 32px; font-weight: bold; color: #38bdf8; }
+        .stat .label { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+
+        .alertas-container {
+            margin: 20px 30px 0;
+        }
+        .alertas-container h2 { color: #f59e0b; margin-bottom: 10px; font-size: 16px; }
+        .alerta {
+            background: #431407;
+            border-left: 4px solid #f59e0b;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #fcd34d;
+        }
+        .sin-alertas { color: #22c55e; font-size: 14px; }
+
+        .sensores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 20px 30px;
+        }
+        .sensor-card {
+            background: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid #38bdf8;
+            transition: transform 0.2s;
+        }
+        .sensor-card:hover { transform: translateY(-3px); }
+        .sensor-card.alerta-activa { border-left-color: #f59e0b; background: #1c1a10; }
+        
+        .sensor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .sensor-id {
+            background: #0ea5e9;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .sensor-tipo {
+            font-size: 12px;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+        .sensor-valor {
+            font-size: 36px;
+            font-weight: bold;
+            color: #e2e8f0;
+            margin: 10px 0;
+        }
+        .sensor-valor span { font-size: 16px; color: #94a3b8; }
+        .sensor-ip { font-size: 11px; color: #475569; margin-top: 10px; }
+
+        .iconos { font-size: 24px; }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            color: #475569;
+            font-size: 12px;
+            border-top: 1px solid #1e293b;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🛰️ Sistema de Monitoreo IoT</h1>
+    <div class="status">
+        <div class="dot"></div>
+        <span id="ultimo-update">Conectando...</span>
+    </div>
+</header>
+
+<div class="stats-bar">
+    <div class="stat">
+        <div class="numero" id="total-sensores">0</div>
+        <div class="label">Sensores Activos</div>
+    </div>
+    <div class="stat">
+        <div class="numero" id="total-alertas" style="color:#f59e0b">0</div>
+        <div class="label">Alertas Activas</div>
+    </div>
+    <div class="stat">
+        <div class="numero" style="color:#22c55e">EN LÍNEA</div>
+        <div class="label">Estado del Sistema</div>
+    </div>
+</div>
+
+<div class="alertas-container">
+    <h2>⚠️ Alertas</h2>
+    <div id="alertas-lista"><p class="sin-alertas">Sin alertas activas</p></div>
+</div>
+
+<div class="sensores-grid" id="sensores-grid">
+    <p style="color:#475569">Cargando sensores...</p>
+</div>
+
+<footer>
+    Actualización automática cada 3 segundos &nbsp;|&nbsp; IoT Monitor v1.0
+</footer>
+
+<script>
+    const ICONOS = {
+        temperatura: '🌡️',
+        humedad: '💧',
+        presion: '🔵',
+        vibracion: '📳',
+        energia: '⚡'
+    };
+
+    const LIMITES = {
+        temperatura: 35,
+        humedad: 90,
+        presion: 1050,
+        vibracion: 8,
+        energia: 400
+    };
+
+    let alertas = [];
+
+    function actualizar() {
+        fetch('/api/data')
+            .then(r => r.json())
+            .then(data => {
+                const ahora = new Date().toLocaleTimeString();
+                document.getElementById('ultimo-update').textContent = 'Última actualización: ' + ahora;
+
+                const sensores = Array.isArray(data) ? data : [];
+                document.getElementById('total-sensores').textContent = sensores.length;
+
+                // Detectar alertas
+                alertas = [];
+                sensores.forEach(s => {
+                    const limite = LIMITES[s.tipo];
+                    if (limite && s.valor > limite) {
+                        alertas.push(`${ICONOS[s.tipo] || '⚠️'} ${s.id} (${s.tipo}): ${s.valor} ${s.unidad} supera el límite de ${limite}`);
+                    }
+                });
+
+                document.getElementById('total-alertas').textContent = alertas.length;
+
+                // Mostrar alertas
+                const alertasDiv = document.getElementById('alertas-lista');
+                if (alertas.length === 0) {
+                    alertasDiv.innerHTML = '<p class="sin-alertas">Sin alertas activas</p>';
+                } else {
+                    alertasDiv.innerHTML = alertas.map(a => `<div class="alerta">${a}</div>`).join('');
+                }
+
+                // Mostrar tarjetas de sensores
+                const grid = document.getElementById('sensores-grid');
+                if (sensores.length === 0) {
+                    grid.innerHTML = '<p style="color:#475569">Sin sensores activos. Inicia los clientes.</p>';
+                    return;
+                }
+                grid.innerHTML = sensores.map(s => {
+                    const icono = ICONOS[s.tipo] || '📡';
+                    const limite = LIMITES[s.tipo];
+                    const enAlerta = limite && s.valor > limite;
+                    return `
+                        <div class="sensor-card ${enAlerta ? 'alerta-activa' : ''}">
+                            <div class="sensor-header">
+                                <span class="sensor-id">${s.id}</span>
+                                <span class="sensor-tipo">${icono} ${s.tipo}</span>
+                            </div>
+                            <div class="sensor-valor">${s.valor} <span>${s.unidad}</span></div>
+                            ${enAlerta ? '<div style="color:#f59e0b;font-size:13px">⚠️ Valor fuera de rango</div>' : ''}
+                            <div class="sensor-ip">IP: ${s.ip}</div>
+                        </div>
+                    `;
+                }).join('');
+            })
+            .catch(() => {
+                document.getElementById('ultimo-update').textContent = 'Error de conexión';
+            });
+    }
+
+    actualizar();
+    setInterval(actualizar, 3000);
+</script>
+
+</body>
+</html>

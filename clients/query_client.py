@@ -1,50 +1,56 @@
 #!/usr/bin/env python3
 """
-Cliente de Consulta — se conecta al servidor vía TCP
-Uso: python3 query_client.py <SERVER_IP>
+Cliente Operador — consulta el servidor vía TCP
+Uso: python3 query_client.py <SERVER_HOSTNAME>
 """
 
 import socket
-import json
 import sys
 
-def enviar_comando(sock, comando_dict):
-    sock.sendall(json.dumps(comando_dict).encode())
-    respuesta = sock.recv(4096)
-    return json.loads(respuesta.decode())
+def resolver_hostname(hostname):
+    try:
+        ip = socket.gethostbyname(hostname)
+        print(f"[DNS] {hostname} → {ip}")
+        return ip
+    except socket.gaierror:
+        print(f"[ERROR] No se pudo resolver {hostname}")
+        sys.exit(1)
+
+def enviar_comando(sock, comando):
+    sock.sendall((comando + "\n").encode())
+    respuesta = sock.recv(4096).decode().strip()
+    return respuesta
 
 def main():
-    server_ip = sys.argv[1] if len(sys.argv) > 1 else '127.0.0.1'
+    hostname = sys.argv[1] if len(sys.argv) > 1 else 'server.iot-monitor.local'
     port = 9001
+
+    server_ip = resolver_hostname(hostname)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((server_ip, port))
-    print(f"✅ Conectado al servidor {server_ip}:{port}\n")
+    print(f"Conectado a {hostname}:{port}\n")
 
     while True:
-        print("\nComandos disponibles:")
-        print("  1) LIST  — listar sensores activos")
-        print("  2) GET   — obtener datos de un sensor")
-        print("  3) STATS — estadísticas globales")
+        print("\nComandos:")
+        print("  1) LIST  — sensores activos")
+        print("  2) GET   — datos de un sensor")
+        print("  3) STATS — estadísticas")
         print("  4) Salir")
         opcion = input("\nOpción: ").strip()
 
         if opcion == '1':
-            resp = enviar_comando(sock, {'comando': 'LIST'})
-            print(f"Sensores activos: {resp.get('sensores', [])}")
+            resp = enviar_comando(sock, "LIST|")
+            print(f"Respuesta: {resp}")
 
         elif opcion == '2':
             sid = input("ID del sensor: ").strip()
-            resp = enviar_comando(sock, {'comando': 'GET', 'sensor_id': sid})
-            datos = resp.get('datos', [])
-            print(f"\nÚltimas lecturas de {sid}:")
-            for d in datos:
-                print(f"  {d['timestamp']} → {d['datos']}")
+            resp = enviar_comando(sock, f"GET|{sid}")
+            print(f"Respuesta: {resp}")
 
         elif opcion == '3':
-            resp = enviar_comando(sock, {'comando': 'STATS'})
-            print(f"Total sensores: {resp.get('total_sensores')}")
-            print(f"Total lecturas: {resp.get('total_lecturas')}")
+            resp = enviar_comando(sock, "STATS|")
+            print(f"Respuesta: {resp}")
 
         elif opcion == '4':
             break
@@ -53,4 +59,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

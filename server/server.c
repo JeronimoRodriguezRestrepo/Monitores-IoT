@@ -38,6 +38,7 @@ typedef struct {
     int port;
     char rol[16];
     int activo;
+    int es_operador;
 } Operador;
 
 // ─────────────────────────────────────────
@@ -73,12 +74,54 @@ void log_evento(const char *ip, int port, const char *mensaje, const char *respu
 }
 
 // ─────────────────────────────────────────
+// AUTENTICACIÓN — consulta servicio externo
+// ─────────────────────────────────────────
+int autenticar(const char *usuario, const char *password, char *rol) {
+    struct addrinfo hints, *res;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+
+    // Resolver nombre del servicio de auth
+    if (getaddrinfo("server.iot-monitor.local", "9002", &hints, &res) != 0) {
+        printf("[AUTH] Error resolviendo hostname\n");
+        return 0;
+    }
+
+    int sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    if (connect(sock, res->ai_addr, res->ai_addrlen) < 0) {
+        printf("[AUTH] No se pudo conectar al servicio de auth\n");
+        freeaddrinfo(res);
+        close(sock);
+        return 0;
+    }
+    freeaddrinfo(res);
+
+    char msg[256];
+    snprintf(msg, sizeof(msg), "AUTH|%s|%s\n", usuario, password);
+    send(sock, msg, strlen(msg), 0);
+
+    char respuesta[256];
+    memset(respuesta, 0, sizeof(respuesta));
+    recv(sock, respuesta, sizeof(respuesta) - 1, 0);
+    close(sock);
+
+    respuesta[strcspn(respuesta, "\n")] = 0;
+
+    if (strncmp(respuesta, "OK|", 3) == 0) {
+        strncpy(rol, respuesta + 3, 31);
+        return 1;
+    }
+    return 0;
+}
+
+// ─────────────────────────────────────────
 // ALERTAS — notificar a operadores
 // ─────────────────────────────────────────
 void notificar_operadores(const char *alerta) {
     pthread_mutex_lock(&mutex);
     for (int i = 0; i < num_operadores; i++) {
-        if (operadores[i].activo) {
+        if (operadores[i].activo && operadores[i].es_operador) {
             send(operadores[i].socket, alerta, strlen(alerta), 0);
         }
     }
@@ -241,7 +284,25 @@ void procesar_mensaje(const char *msg, char *respuesta, const char *ip, int port
         pthread_mutex_unlock(&mutex);
         snprintf(respuesta, MAX_MSG, "ERROR|sensor no encontrado");
     }
-
+    // LOGIN|usuario|password
+    else if (strcmp(cmd, "LOGIN") == 0) {
+        char *usuario  = strtok(NULL, "|");
+        char *password = strtok(NULL, "|");
+        if (!usuario || !password) {
+            snprintf(respuesta, MAX_MSG, "ERROR|faltan campos");
+            return;
+        }
+        char rol[32] = "";
+        if (autenticar(usuario, password, rol)) {
+            snprintf(respuesta, MAX_MSG, "OK|bienvenido %s|rol:%s", usuario, rol);
+        } else {
+            snprintf(respuesta, MAX_MSG, "ERROR|credenciales invalidas");
+        }
+    }
+    // OPERATOR|
+    else if (strcmp(cmd, "OPERATOR") == 0) {
+        snprintf(respuesta, MAX_MSG, "OK|registrado como operador");
+    }
     else {
         snprintf(respuesta, MAX_MSG, "ERROR|comando desconocido");
     }
@@ -398,33 +459,28 @@ void *http_server(void *arg) {
                 "Access-Control-Allow-Origin: *\r\n\r\n%s", json);
             send(client, resp, strlen(resp), 0);
         } else {
-            // HTML dashboard
-            char html[8192];
-            snprintf(html, sizeof(html),
-                "<!DOCTYPE html><html><head><meta charset='UTF-8'>"
-                "<title>IoT Monitor</title>"
-                "<meta http-equiv='refresh' content='5'>"
-                "<style>body{font-family:Arial;background:#0f172a;color:#e2e8f0;padding:20px}"
-                "h1{color:#38bdf8}.sensor{background:#1e293b;border-radius:8px;padding:15px;"
-                "margin:10px 0;border-left:4px solid #38bdf8}"
-                ".badge{background:#0ea5e9;padding:2px 8px;border-radius:12px;font-size:11px}"
-                "</style></head><body>"
-                "<h1>Sistema de Monitoreo IoT</h1>"
-                "<p>Actualizacion automatica cada 5 segundos</p>"
-                "<div id='content'>Cargando...</div>"
-                "<script>"
-                "fetch('/api/data').then(r=>r.json()).then(data=>{"
-                "let h='';data.forEach(s=>{"
-                "h+=`<div class='sensor'><strong>Sensor: <span class='badge'>${s.id}</span></strong>"
-                "<br>Tipo: ${s.tipo} | Valor: <b>${s.valor} ${s.unidad}</b> | IP: ${s.ip}</div>`;"
-                "});document.getElementById('content').innerHTML=h||'Sin sensores activos';"
-                "});</script></body></html>");
+            // Leer dashboard.html
+            FILE *f = fopen("/home/ubuntu/iot-monitor/web/dashboard.html", "r");
+            if (!f) {
+                char *msg = "HTTP/1.1 404 Not Found\r\n\r\nDashboard no encontrado";
+                send(client, msg, strlen(msg), 0);
+                close(client);
+                continue;
+            }
+            fseek(f, 0, SEEK_END);
+            long fsize = ftell(f);
+            fseek(f, 0, SEEK_SET);
+            char *html = malloc(fsize + 1);
+            fread(html, 1, fsize, f);
+            fclose(f);
+            html[fsize] = 0;
 
-            char resp[9000];
-            snprintf(resp, sizeof(resp),
-                "HTTP/1.1 200 OK\r\n"
-                "Content-Type: text/html; charset=utf-8\r\n\r\n%s", html);
-            send(client, resp, strlen(resp), 0);
+            char header[256];
+            snprintf(header, sizeof(header),
+                "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\n\r\n");
+            send(client, header, strlen(header), 0);
+            send(client, html, fsize, 0);
+            free(html);
         }
         close(client);
     }
