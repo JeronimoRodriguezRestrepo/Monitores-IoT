@@ -1,4 +1,5 @@
 server/logs.txt
 server/server
+logs.txt
+server.py
 clients/QueryClient.class
-
