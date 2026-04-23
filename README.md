@@ -128,7 +128,9 @@ cd Monitores-IoT
    ```bash
     cd monitores-iot
     cd clients
-    #Cada uno se abre desde una terminal diferente
+   
+    # Cada uno se abre desde una terminal diferente
+    # Utilizar su ip publica 
     python sensor_client.py <<IP_PUBLICA>> sensor-local-01 temperatura
     python sensor_client.py <<IP_PUBLICA>> sensor-local-02 humedad
     python sensor_client.py <<IP_PUBLICA>> sensor-local-03 presion
