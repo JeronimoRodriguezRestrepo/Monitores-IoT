@@ -174,13 +174,20 @@
                 document.getElementById('total-sensores').textContent = sensores.length;
 
                 // Detectar alertas
-                alertas = [];
-                sensores.forEach(s => {
-                    const limite = LIMITES[s.tipo];
-                    if (limite && s.valor > limite) {
-                        alertas.push(`${ICONOS[s.tipo] || '⚠️'} ${s.id} (${s.tipo}): ${s.valor} ${s.unidad} supera el límite de ${limite}`);
-                    }
-                });
+		sensores.forEach(s => {
+    			const limite = LIMITES[s.tipo];
+    			if (limite && s.valor > limite) {
+        			const msg = `${ICONOS[s.tipo] || '⚠️'} ${s.id} (${s.tipo}): ${s.valor} ${s.unidad} supera el límite de ${limite} — ${new Date().toLocaleTimeString()}`;
+        		// Evitar duplicados recientes
+        		if (!alertas.find(a => a.includes(s.id) && a.includes(s.tipo))) {
+            			alertas.unshift(msg);
+        		} else {
+            			alertas = alertas.map(a => a.includes(s.id) && a.includes(s.tipo) ? msg : a);
+        		}
+        		// Guardar máximo 20 alertas
+        		if (alertas.length > 20) alertas = alertas.slice(0, 20);
+    			}
+		});
 
                 document.getElementById('total-alertas').textContent = alertas.length;
 
