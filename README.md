@@ -77,17 +77,18 @@ sudo systemctl restart systemd-networkd
 # Terminal 2 - Servicio de autenticación
 python3 server/auth_server.py
 
-# Terminal 3 al 7 - Sensores
-python3 clients/sensor_client.py server.iot-monitor.local sensor-01 temperatura
-python3 clients/sensor_client.py server.iot-monitor.local sensor-02 humedad
-python3 clients/sensor_client.py server.iot-monitor.local sensor-03 presion
-python3 clients/sensor_client.py server.iot-monitor.local sensor-04 vibracion
-python3 clients/sensor_client.py server.iot-monitor.local sensor-05 energia
+# Terminal 3 al 7 - Sensores (desde terminal de aws
+python3 monitores-iot/clients/sensor_client.py server.iot-monitor.local sensor-01 temperatura
+python3 monitores-iot/clients/sensor_client.py server.iot-monitor.local sensor-02 humedad
+python3 monitores-iot/clients/sensor_client.py server.iot-monitor.local sensor-03 presion
+python3 monitores-iot/clients/sensor_client.py server.iot-monitor.local sensor-04 vibracion
+python3 monitores-iot/clients/sensor_client.py server.iot-monitor.local sensor-05 energia
 
 # Cliente Python
-python3 clients/query_client.py server.iot-monitor.local
+python3 monitoes-iot/clients/query_client.py server.iot-monitor.local
 
 # Cliente Java
+cd monitores-iot
 javac clients/QueryClient.java -d clients/
 java -cp clients/ QueryClient server.iot-monitor.local
 ```
@@ -112,3 +113,27 @@ http://<IP_PUBLICA_EC2>:8080
 - Servicio: AWS Route 53
 - Hosted zone: `iot-monitor.local` (privada)
 - Registro: `server.iot-monitor.local` tipo A
+
+## Como correr sensores desde computador local
+
+1. Clonar repositorio
+  ```bash
+git clone https://github.com/JeronimoRodriguezRestrepo/Monitores-IoT.git
+cd Monitores-IoT
+```
+
+2. Tener corriendo el server en la terminal AWS
+
+3. Correr los sensores en el powershell
+   ```bash
+    cd monitores-iot
+    cd clients
+    #Cada uno se abre desde una terminal diferente
+    python sensor_client.py <<IP_PUBLICA>> sensor-local-01 temperatura
+    python sensor_client.py <<IP_PUBLICA>> sensor-local-02 humedad
+    python sensor_client.py <<IP_PUBLICA>> sensor-local-03 presion
+    python sensor_client.py <<IP_PUBLICA>> sensor-local-04 vibracion
+    python sensor_client.py <<IP_PUBLICA>> sensor-local-05 energia
+   
+
+```
