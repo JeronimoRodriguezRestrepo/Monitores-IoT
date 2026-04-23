@@ -85,7 +85,7 @@ python3 monitores-iot/clients/sensor_client.py server.iot-monitor.local sensor-0
 python3 monitores-iot/clients/sensor_client.py server.iot-monitor.local sensor-05 energia
 
 # Cliente Python
-python3 monitoes-iot/clients/query_client.py server.iot-monitor.local
+python3 monitores-iot/clients/query_client.py server.iot-monitor.local
 
 # Cliente Java
 cd monitores-iot
